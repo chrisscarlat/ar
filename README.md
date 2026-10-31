@@ -7,7 +7,7 @@ the painting and see a video play exactly on top of it. No app to install.
 - Plain HTML and vanilla JavaScript. No framework, no build step.
 - [MindAR](https://github.com/hiukim/mind-ar-js) image tracking with plain [three.js](https://threejs.org/), loaded from a CDN at pinned versions.
 - [Supabase](https://supabase.com/) for the database, file storage and admin login. No custom server.
-- Hosted for free on GitHub Pages.
+- Hosted for free on Vercel as a static site (no build step).
 - Built for older phones: iPhone 8 / iOS Safari 14+, mid-range Android from around 2018 / Chrome 90+.
 
 ## How it works
@@ -86,15 +86,28 @@ window.AR_CONFIG = {
 The anon (or publishable) key is meant to be public; RLS protects your data.
 **Never** put the `service_role` / secret key in this repository or any page.
 
-## 3. Deploy to GitHub Pages
+## 3. Deploy to Vercel
 
-1. In the repository go to **Settings → Pages** and set **Source** to **GitHub Actions**.
-2. Push to `main`. The workflow in `.github/workflows/pages.yml` publishes the
-   site, for example at `https://<user>.github.io/ar/`.
-3. In Supabase, **Authentication → URL Configuration**, set **Site URL** to
-   your Pages URL.
+The site is plain static files. `vercel.json` sets security headers and
+`.vercelignore` keeps the README and SQL out of the deployment.
 
-The camera only works over HTTPS, which GitHub Pages provides. To test locally,
+**With Git (recommended):** in Vercel, **Add New → Project**, import this
+repository, set **Framework Preset** to **Other**, and leave the build command
+and output directory empty. Every push to `main` deploys to production, and
+pull requests get preview URLs.
+
+**With the CLI:**
+
+```sh
+vercel login          # sign in to the account that should own the site
+vercel link           # create or pick the project
+vercel --prod         # deploy
+```
+
+Then in Supabase, **Authentication → URL Configuration**, set **Site URL** to
+your Vercel URL.
+
+The camera only works over HTTPS, which Vercel provides. To test locally,
 run a static server (for example `python3 -m http.server`) and open
 `http://localhost:8000`. Browsers allow the camera on `localhost`. To test on a
 phone you need HTTPS, for example via a tunnel or the deployed site.
