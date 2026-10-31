@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin · AR Artworks</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" crossorigin="anonymous"></script>
+  <script src="../js/config.js"></script>
+  <script type="module" src="../js/admin.js"></script>
+</head>
+<body>
+  <header class="admin-header">
+    <div class="container admin-header__inner">
+      <h1>AR admin</h1>
+      <div class="admin-header__account">
+        <span id="who"></span>
+        <button id="sign-out" class="button button--secondary button--small" type="button" hidden>Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <p id="boot-status" role="status">Loading…</p>
+
+    <section id="login" class="panel" hidden aria-labelledby="login-title">
+      <h2 id="login-title">Sign in</h2>
+      <form id="login-form" class="form">
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input id="login-email" name="email" type="email" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="button" type="submit">Sign in</button>
+        <p id="login-status" class="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <div id="workspace" hidden>
+      <section id="editor" class="panel" aria-labelledby="editor-title">
+        <h2 id="editor-title">New artwork</h2>
+        <form id="artwork-form" class="form" novalidate>
+          <div class="field">
+            <label for="title">Title</label>
+            <input id="title" name="title" type="text" maxlength="200" required autocomplete="off">
+          </div>
+
+          <div class="field">
+            <label for="marker">Marker image <span class="label-note">JPG or PNG of the painting</span></label>
+            <input id="marker" name="marker" type="file" accept="image/jpeg,image/png" aria-describedby="marker-help">
+            <p id="marker-help" class="help">A straight-on photo of the painting, cropped to its edges. The video will cover exactly this area.</p>
+            <div id="marker-progress-wrap" class="progress" hidden>
+              <label for="marker-progress">Preparing marker</label>
+              <progress id="marker-progress" max="100" value="0"></progress>
+            </div>
+            <p id="marker-status" class="form-status" role="status" aria-live="polite"></p>
+            <img id="marker-preview" class="marker-preview" alt="Marker preview" hidden>
+          </div>
+
+          <div class="field">
+            <label for="video">Overlay video <span class="label-note">MP4, H.264</span></label>
+            <input id="video" name="video" type="file" accept="video/mp4" aria-describedby="video-help">
+            <p id="video-help" class="help">720p, 2 to 4 Mbps, under 10 MB. Same shape as the marker image.</p>
+            <p id="video-status" class="form-status" role="status" aria-live="polite"></p>
+          </div>
+
+          <fieldset class="field checks">
+            <legend>Playback</legend>
+            <label class="check"><input id="loop" name="loop" type="checkbox" checked> Loop video</label>
+            <label class="check"><input id="active" name="active" type="checkbox" checked> Active (visitors can view it)</label>
+          </fieldset>
+
+          <div id="warnings" class="notice notice--warn" hidden>
+            <h3 class="warnings__title">Check before publishing</h3>
+            <ul id="warnings-list"></ul>
+          </div>
+
+          <div class="form-actions">
+            <button id="save" class="button" type="submit">Save artwork</button>
+            <button id="cancel-edit" class="button button--secondary" type="button" hidden>Cancel editing</button>
+          </div>
+          <div id="save-progress-wrap" class="progress" hidden>
+            <label for="save-progress">Saving</label>
+            <progress id="save-progress" max="100"></progress>
+          </div>
+          <p id="save-status" class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="panel" aria-labelledby="list-title">
+        <h2 id="list-title">Artworks</h2>
+        <p id="list-status" role="status" aria-live="polite"></p>
+        <ul id="artwork-list" class="artwork-list"></ul>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
