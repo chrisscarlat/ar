@@ -302,6 +302,8 @@
           signUrl('videos', row.video_path)
         ]).then(function (urls) {
           artwork.targetUrl = urls[0];
+          // Warm the HTTP cache so tracking can start sooner after "Start".
+          if (arModulePromise) fetch(artwork.targetUrl).catch(function () {});
           video = createVideo(urls[1], row.loop);
           els.status.textContent = '';
           els.start.disabled = false;
