@@ -44,10 +44,14 @@ supabase/schema.sql   table, storage buckets, RLS policies
 | es-module-shims | 1.10.0 | scan, import maps on iOS < 16.4 |
 | @supabase/supabase-js | 2.45.4 | admin |
 | qrcode-generator | 1.4.4 | admin |
+| fflate | 0.8.2 | scan and admin, gzip for `.mind` files |
 
-The scan page transfers about 630 KB (gzipped) before the tracking file and
-the video. Most of that is MindAR's TensorFlow.js core (about 370 KB) and
-three.js (about 165 KB). The browser caches it after the first visit.
+Before the video, the scan page transfers about 650 KB of code (gzipped). Most
+of that is MindAR's TensorFlow.js core (about 370 KB) and three.js (about
+165 KB). On top of that comes the artwork's tracking file, typically 80 to
+260 KB. The admin stores it gzipped, because Supabase Storage serves files
+uncompressed. In total that is about 0.75 to 0.9 MB, and the browser caches
+the libraries after the first visit.
 
 ## 1. Set up Supabase
 
@@ -118,7 +122,7 @@ Tracking quality depends almost entirely on the marker image.
 - **Detailed**: lots of edges, corners and texture spread across the whole image.
 - **Non-repetitive**: avoid grids, stripes, tiles and large flat or gradient areas.
   Repeating patterns confuse the matcher.
-- 1000 px on the long side is plenty. The admin scales larger images down.
+- 800 px on the long side is plenty. The admin scales larger images down, which also keeps the tracking file small.
 - If the admin warns about contrast or features, try a better photo before you print the QR code.
 
 ## Video encoding
