@@ -1,0 +1,110 @@
+/* Scan page. Kept small: this page must load fast on old phones. */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: #000;
+  color: #fff;
+  overscroll-behavior: none;
+}
+
+.screen {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  background: var(--bg);
+  color: var(--text);
+}
+
+.screen__inner {
+  width: 100%;
+  max-width: 480px;
+}
+
+.button--large {
+  width: 100%;
+  min-height: 56px;
+  font-size: 20px;
+}
+
+.status {
+  min-height: 1.5em;
+  color: var(--muted);
+}
+
+.small {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.player video {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  background: #000;
+  border-radius: var(--radius);
+}
+
+/* AR view: full-screen camera with the WebGL canvas on top. */
+.ar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+/* z-index creates a stacking context so MindAR's camera video (z-index: -2) stays visible. */
+.ar__container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ar__hint {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  z-index: 1;
+  margin: 0 auto;
+  max-width: 420px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+  animation: hint-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  50% {
+    opacity: 0.75;
+  }
+}
+
+/* prefers-reduced-motion is also handled globally in base.css. */
+@media (prefers-reduced-motion: reduce) {
+  .ar__hint {
+    animation: none;
+  }
+}

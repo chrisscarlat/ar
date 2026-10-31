@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>AR Viewer</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/scan.css">
+  <!-- Import map polyfill for iOS Safari < 16.4. No-op where import maps are native. -->
+  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js" crossorigin="anonymous"></script>
+  <!-- three 0.160.0 is required: MindAR 1.2.5 uses sRGBEncoding, removed in three 0.162. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+      "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+    }
+  }
+  </script>
+  <script src="../js/config.js"></script>
+  <script src="../js/scan.js" defer></script>
+</head>
+<body>
+  <main>
+    <section id="intro" class="screen" aria-labelledby="title">
+      <div class="screen__inner">
+        <h1 id="title">AR Viewer</h1>
+        <p>Point your camera at the painting to see it come to life.</p>
+        <button id="start" class="button button--large" type="button" disabled>Start</button>
+        <p id="status" class="status" role="status" aria-live="polite">Loading artwork…</p>
+        <p class="small">The video plays without sound. Nothing is recorded or uploaded from your camera.</p>
+        <noscript><p class="notice notice--error">This page needs JavaScript. Please turn it on and reload.</p></noscript>
+      </div>
+    </section>
+
+    <section id="ar" class="ar" hidden aria-label="Camera view">
+      <div id="ar-container" class="ar__container" aria-hidden="true"></div>
+      <p id="ar-hint" class="ar__hint" role="status" aria-live="polite">Starting camera…</p>
+    </section>
+
+    <section id="help" class="screen" hidden aria-labelledby="help-title">
+      <div class="screen__inner">
+        <h2 id="help-title">Camera access is needed</h2>
+        <p>This page uses your camera to find the painting. Your camera image stays on your phone.</p>
+        <h3>iPhone or iPad (Safari)</h3>
+        <ol>
+          <li>Tap <strong>aA</strong> in the address bar, then <strong>Website Settings</strong>.</li>
+          <li>Set <strong>Camera</strong> to <strong>Allow</strong>.</li>
+          <li>If that option is missing: open the Settings app, tap <strong>Safari</strong>, then <strong>Camera</strong>, and choose <strong>Allow</strong>.</li>
+        </ol>
+        <h3>Android (Chrome)</h3>
+        <ol>
+          <li>Tap the icon left of the web address, then <strong>Permissions</strong>.</li>
+          <li>Turn on <strong>Camera</strong>.</li>
+        </ol>
+        <p>Then tap <strong>Try again</strong>.</p>
+        <div class="actions">
+          <button id="retry" class="button" type="button">Try again</button>
+          <button id="watch-instead" class="button button--secondary" type="button">Watch the video instead</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="fallback" class="screen" hidden aria-labelledby="fallback-title">
+      <div class="screen__inner">
+        <h2 id="fallback-title">Watch the video</h2>
+        <p id="fallback-reason"></p>
+        <div id="fallback-player" class="player"></div>
+      </div>
+    </section>
+
+    <section id="error" class="screen" hidden aria-labelledby="error-title">
+      <div class="screen__inner">
+        <h2 id="error-title">Something went wrong</h2>
+        <p id="error-text"></p>
+        <button id="error-reload" class="button button--secondary" type="button">Reload</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
