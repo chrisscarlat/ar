@@ -1,9 +1,11 @@
 // Marker and video checks for the admin, plus in-browser .mind compilation.
 
 const MINDAR_IMAGE_URL = 'https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js';
+const FFLATE_URL = 'https://cdn.jsdelivr.net/npm/fflate@0.8.2/esm/browser.js';
 
-// Larger markers do not track better but compile much slower.
-const MAX_MARKER_SIDE = 1000;
+// Larger markers do not track better, compile slower and make bigger .mind files
+// (which the scan page must download before tracking starts).
+const MAX_MARKER_SIDE = 800;
 const MIN_MARKER_SIDE = 480;
 // Standard deviation of grey levels (0-255). Below this the image is flat.
 const LOW_CONTRAST = 40;
@@ -70,15 +72,17 @@ function canvasToBlob(canvas, type, quality) {
 let compilerModule = null;
 
 async function compileMind(canvas, onProgress) {
-  if (!compilerModule) compilerModule = import(MINDAR_IMAGE_URL);
-  const { Compiler } = await compilerModule;
+  if (!compilerModule) compilerModule = Promise.all([import(MINDAR_IMAGE_URL), import(FFLATE_URL)]);
+  const [{ Compiler }, { gzipSync }] = await compilerModule;
   const compiler = new Compiler();
   const dataList = await compiler.compileImageTargets([canvas], (percent) => onProgress(Math.min(100, percent)));
   const buffer = await compiler.exportData();
   // matchingData[0] is the full-size scale.
   const full = dataList[0].matchingData[0];
+  // Storage serves files uncompressed; gzip shrinks .mind data about 3x.
+  // The scan page detects the gzip header and inflates it.
   return {
-    blob: new Blob([buffer], { type: 'application/octet-stream' }),
+    blob: new Blob([gzipSync(new Uint8Array(buffer), { level: 9 })], { type: 'application/octet-stream' }),
     features: full.maximaPoints.length + full.minimaPoints.length
   };
 }

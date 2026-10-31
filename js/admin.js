@@ -300,7 +300,7 @@ async function onSave(event) {
 
   if (marker) {
     row.marker_path = `${id}/marker-${stamp}.jpg`;
-    row.target_path = `${id}/target-${stamp}.mind`;
+    row.target_path = `${id}/target-${stamp}.mind.gz`;
     row.marker_width = marker.width;
     row.marker_height = marker.height;
     uploads.push(['markers', row.marker_path, marker.jpeg, 'image/jpeg', 'marker image']);

@@ -4,6 +4,17 @@
 
 import * as THREE from 'three';
 import { MindARThree } from 'mindar-image-three';
+import { gunzipSync } from 'fflate';
+
+// The admin stores .mind files gzipped (Storage does not compress them).
+// Plain .mind files still work. Returns a blob: URL for MindAR to fetch.
+async function loadTarget(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Tracking data request failed: ' + res.status);
+  let bytes = new Uint8Array(await res.arrayBuffer());
+  if (bytes[0] === 0x1f && bytes[1] === 0x8b) bytes = gunzipSync(bytes);
+  return URL.createObjectURL(new Blob([bytes]));
+}
 
 // Wrap getUserMedia while MindAR starts the camera: MindAR asks for no specific
 // resolution, and swallows the error. We ask for a modest size (cheaper to track
@@ -45,9 +56,10 @@ async function withCameraSize(size, start) {
  * `aspect` is marker height / width. Returns { stop }.
  */
 export async function startAR(options) {
+  const targetSrc = await loadTarget(options.targetUrl);
   const mindar = new MindARThree({
     container: options.container,
-    imageTargetSrc: options.targetUrl,
+    imageTargetSrc: targetSrc,
     maxTrack: 1,
     uiLoading: 'no',
     uiScanning: 'no',
@@ -85,7 +97,11 @@ export async function startAR(options) {
   anchor.onTargetFound = options.onFound;
   anchor.onTargetLost = options.onLost;
 
-  await withCameraSize(options.cameraSize, function () { return mindar.start(); });
+  try {
+    await withCameraSize(options.cameraSize, function () { return mindar.start(); });
+  } finally {
+    URL.revokeObjectURL(targetSrc);
+  }
 
   const cameraVideo = options.container.querySelector('video');
   if (cameraVideo) cameraVideo.setAttribute('aria-hidden', 'true');
